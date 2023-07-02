@@ -1,0 +1,26 @@
+--- bgp_attr.c	2021-03-05 03:11:25.000000000 +0100
++++ /usr/src/frr-7.5.1/bgpd/bgp_attr.c	2023-07-01 15:43:43.139596664 +0200
+@@ -1292,7 +1292,7 @@
+ 	[BGP_ATTR_MULTI_EXIT_DISC] = BGP_ATTR_FLAG_OPTIONAL,
+ 	[BGP_ATTR_LOCAL_PREF] = BGP_ATTR_FLAG_TRANS,
+ 	[BGP_ATTR_ATOMIC_AGGREGATE] = BGP_ATTR_FLAG_TRANS,
+-	[BGP_ATTR_AGGREGATOR] = BGP_ATTR_FLAG_TRANS | BGP_ATTR_FLAG_OPTIONAL,
++	[BGP_ATTR_AGGREGATOR] = BGP_ATTR_FLAG_TRANS | BGP_ATTR_FLAG_OPTIONAL | BGP_ATTR_FLAG_EXTLEN,
+ 	[BGP_ATTR_COMMUNITIES] = BGP_ATTR_FLAG_TRANS | BGP_ATTR_FLAG_OPTIONAL,
+ 	[BGP_ATTR_ORIGINATOR_ID] = BGP_ATTR_FLAG_OPTIONAL,
+ 	[BGP_ATTR_CLUSTER_LIST] = BGP_ATTR_FLAG_OPTIONAL,
+@@ -3816,12 +3816,12 @@
+ 	/* Aggregator. */
+ 	if (attr->flag & ATTR_FLAG_BIT(BGP_ATTR_AGGREGATOR)) {
+ 		/* Common to BGP_ATTR_AGGREGATOR, regardless of ASN size */
+-		stream_putc(s, BGP_ATTR_FLAG_OPTIONAL | BGP_ATTR_FLAG_TRANS);
++		stream_putc(s, BGP_ATTR_FLAG_OPTIONAL | BGP_ATTR_FLAG_TRANS | BGP_ATTR_FLAG_EXTLEN);
+ 		stream_putc(s, BGP_ATTR_AGGREGATOR);
+
+ 		if (use32bit) {
+ 			/* AS4 capable peer */
+-			stream_putc(s, 8);
++			stream_putw(s, 8);
+ 			stream_putl(s, attr->aggregator_as);
+ 		} else {
+ 			/* 2-byte AS peer */
